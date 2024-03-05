@@ -137,11 +137,19 @@ class ActionDataPreprocessor(BaseDataPreprocessor):
         # -- Normalization ---
         if self._enable_normalize:
             if view_shape is None:
+                self.mean = self.mean.cuda()
+                self.std = self.std.cuda()
                 batch_inputs = (batch_inputs - self.mean) / self.std
             else:
+                print(f"in pre, batch.shape={batch_inputs.shape}")
+                # print(f"\n\nmean.shape={mean.shape}")
                 mean = self.mean.view(view_shape)
                 std = self.std.view(view_shape)
+                print(f"\n\n,mean.shape={mean.shape}")
+                # batch_inputs = batch_inputs.to(torch.float32)
+                # print(f"in normalization")
                 batch_inputs = (batch_inputs - mean) / std
+            
         elif self.to_float32:
             batch_inputs = batch_inputs.to(torch.float32)
 

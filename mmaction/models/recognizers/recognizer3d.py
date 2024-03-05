@@ -40,7 +40,7 @@ class Recognizer3D(BaseRecognizer):
         # [N, num_crops, C, T, H, W] ->
         # [N * num_crops, C, T, H, W]
         # `num_crops` is calculated by:
-        #   1) `twice_sample` in `SampleFrames`
+    #   1) `twice_sample` in `SampleFrames`
         #   2) `num_sample_positions` in `DenseSampleFrames`
         #   3) `ThreeCrop/TenCrop` in `test_pipeline`
         #   4) `num_clips` in `SampleFrames` or its subclass if `clip_len != 1`

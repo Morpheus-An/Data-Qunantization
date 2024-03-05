@@ -21,4 +21,6 @@ visualizer = dict(type='ActionVisualizer', vis_backends=vis_backends)
 
 log_level = 'INFO'
 load_from = None
+# use the pre-trained model for the whole TSN network
+# load_from = 'https://download.openmmlab.com/mmaction/v1.0/recognition/tsn/tsn_imagenet-pretrained-r50_8xb32-1x1x3-100e_kinetics400-rgb/tsn_imagenet-pretrained-r50_8xb32-1x1x3-100e_kinetics400-rgb_20220906-cd10898e.pth'  # 模型路径可以在模型库中找到
 resume = False

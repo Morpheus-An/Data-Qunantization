@@ -255,11 +255,18 @@ class BaseRecognizer(BaseModel, metaclass=ABCMeta):
             - If ``mode="loss"``, return a dict of tensor.
         """
         if mode == 'tensor':
-            return self._forward(inputs, **kwargs)
+            out = self._forward(inputs, **kwargs)
+            # print(f"in tensor.out={out}")
+            return out
         if mode == 'predict':
-            return self.predict(inputs, data_samples, **kwargs)
+            out = self.predict(inputs, data_samples, **kwargs)
+            # print(f"in predict, out={out}")
+            return out
         elif mode == 'loss':
-            return self.loss(inputs, data_samples, **kwargs)
+            out = self.loss(inputs, data_samples, **kwargs)
+            # print(f"in loss. out={out}")
+            # in loss. out={'top1_acc': tensor(0., device='cuda:0', dtype=torch.float64), 'top5_acc': tensor(0.2500, device='cuda:0', dtype=torch.float64), 'loss_cls': tensor(4.4893, device='cuda:0', grad_fn=<MulBackward0>)}
+            return out
         else:
             raise RuntimeError(f'Invalid mode "{mode}". '
                                'Only supports loss, predict and tensor mode')

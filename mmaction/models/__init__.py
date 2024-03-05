@@ -12,3 +12,4 @@ from .roi_heads import *  # noqa: F401,F403
 from .similarity import *  # noqa: F401,F403
 from .task_modules import *  # noqa: F401,F403
 from .utils import *  # noqa: F401,F403
+from .vq_vae import *

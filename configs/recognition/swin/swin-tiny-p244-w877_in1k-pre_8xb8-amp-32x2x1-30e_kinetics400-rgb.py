@@ -6,7 +6,8 @@ model = dict(
     backbone=dict(
         pretrained=  # noqa: E251
         'https://download.openmmlab.com/mmaction/v1.0/recognition/swin/swin_tiny_patch4_window7_224.pth'  # noqa: E501
-    ))
+    ),
+    )
 
 # dataset settings
 dataset_type = 'VideoDataset'
@@ -19,7 +20,7 @@ ann_file_test = 'data/kinetics400/kinetics400_val_list_videos.txt'
 file_client_args = dict(io_backend='disk')
 train_pipeline = [
     dict(type='DecordInit', **file_client_args),
-    dict(type='SampleFrames', clip_len=32, frame_interval=2, num_clips=1),
+    dict(type='SampleFrames', clip_len=16, frame_interval=2, num_clips=1),
     dict(type='DecordDecode'),
     dict(type='Resize', scale=(-1, 256)),
     dict(type='RandomResizedCrop'),
@@ -32,7 +33,7 @@ val_pipeline = [
     dict(type='DecordInit', **file_client_args),
     dict(
         type='SampleFrames',
-        clip_len=32,
+        clip_len=16,
         frame_interval=2,
         num_clips=1,
         test_mode=True),
@@ -46,7 +47,7 @@ test_pipeline = [
     dict(type='DecordInit', **file_client_args),
     dict(
         type='SampleFrames',
-        clip_len=32,
+        clip_len=  16,
         frame_interval=2,
         num_clips=4,
         test_mode=True),
@@ -101,7 +102,7 @@ test_cfg = dict(type='TestLoop')
 optim_wrapper = dict(
     type='AmpOptimWrapper',
     optimizer=dict(
-        type='AdamW', lr=1e-3, betas=(0.9, 0.999), weight_decay=0.02),
+        type='AdamW', lr=1e-3, weight_decay=0.02), # 删掉了betas的关键字参数
     constructor='SwinOptimWrapperConstructor',
     paramwise_cfg=dict(
         absolute_pos_embed=dict(decay_mult=0.),

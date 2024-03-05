@@ -122,5 +122,23 @@ def main():
     runner.test()
 
 
+
+
+    # print('learn more:\n')
+    # model = runner.model
+    # print(f"type(model) is {type(model)}")
+    # # print(f"cfg is {cfg}")
+    # # print(model, runner.model_name)
+    # train_dataloader = runner.train_dataloader
+    # print(f"train_dataloder: {runner.train_dataloader}, type is {type(runner.train_dataloader)}" )
+    # print(f"len(dataloader): {len(train_dataloader)}")
+    # # print(f"{train_dataloader[0]}")
+    # for batch in train_dataloader:
+    #     print(type(batch))
+    #     print(f"keys: {batch.keys()}")
+    #     print(f"inputs: {len(batch['inputs'])}, type:{type(batch['inputs'])}, {batch['inputs'][0].shape}")
+    #     print(f"data_sample: {len(batch['data_samples'])}, type:{type(batch['data_samples'])}, {batch['data_samples'][0]}")
+    #     break
+
 if __name__ == '__main__':
     main()

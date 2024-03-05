@@ -216,9 +216,13 @@ def main():
             f"Supported datasets are 'ucf101, sthv1, sthv2', 'jester', "
             f"'mmit', 'mit', 'kinetics400', 'kinetics600', 'kinetics700', but "
             f'got {args.dataset}')
-
+    # print(len(splits), args.num_split)
+    # print(len(splits[0]))
+    # print(len(splits[0][0]))
+    # print(splits[0][0][:5])
+    
     assert len(splits) == args.num_split
-
+    # assert 0
     out_path = args.out_root_path + args.dataset
 
     if len(splits) > 1:
@@ -227,6 +231,12 @@ def main():
                 split, frame_info, shuffle=args.shuffle)
             train_name = f'{args.dataset}_train_split_{i+1}_{args.format}.txt'
             val_name = f'{args.dataset}_val_split_{i+1}_{args.format}.txt'
+            # print(len(file_lists))
+            # print(len(file_lists[0]))
+            # print(len(file_lists[0][0]))
+            # print(len(file_lists[0][1]))
+            # print(file_lists)
+            # assert 0
             if args.output_format == 'txt':
                 with open(osp.join(out_path, train_name), 'w') as f:
                     f.writelines(file_lists[0][0])

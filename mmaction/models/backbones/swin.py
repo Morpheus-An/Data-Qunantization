@@ -642,6 +642,10 @@ class PatchEmbed3D(BaseModule):
             Defaults to None.
         init_cfg (dict, optional): Config dict for initialization.
             Defaults to None.
+        
+    forward:
+        input.shape: B, C, D, H, W
+        output.shape: B, embed_dims, Dp, Hp, Wp
     """
 
     def __init__(self,
@@ -674,12 +678,13 @@ class PatchEmbed3D(BaseModule):
         Args:
             x (torch.Tensor): The input videos of shape
                 :math:`(B, C, D, H, W)`. In most cases, C is 3.
+                B--Batchsize, C-channels--3, D--D frames which each contains H*W*C pixels
 
         Returns:
             torch.Tensor: The video patches of shape
                 :math:`(B, embed_dims, Dp, Hp, Wp)`.
         """
-
+        # print(f"in forward:{x.size()}")
         _, _, D, H, W = x.size()
         if W % self.patch_size[2] != 0:
             x = F.pad(x, (0, self.patch_size[2] - W % self.patch_size[2]))
@@ -695,9 +700,9 @@ class PatchEmbed3D(BaseModule):
             Dp, Hp, Wp = x.size(2), x.size(3), x.size(4)
             x = x.flatten(2).transpose(1, 2)  # B Dp*Hp*Wp C
             x = self.norm(x)
-            x = x.transpose(1, 2).view(-1, self.embed_dims, Dp, Hp, Wp)
+            x = x.transpose(1, 2).view(-1, self.embed_dims, Dp, Hp, Wp) 
 
-        return x
+        return x # B embed_dims Dp Hp Wp 
 
 
 @MODELS.register_module()
@@ -834,7 +839,7 @@ class SwinTransformer3D(BaseModule):
             'norm_cfg': norm_cfg if patch_norm else None,
             'conv_cfg': dict(type='Conv3d')
         }
-        self.patch_embed = PatchEmbed3D(**_patch_cfg)
+        self.patch_embed = PatchEmbed3D(**_patch_cfg) 
         self.pos_drop = nn.Dropout(p=drop_rate)
 
         # stochastic depth
@@ -866,7 +871,7 @@ class SwinTransformer3D(BaseModule):
                 'with_cp': with_cp
             }
 
-            layer = BasicLayer(**_layer_cfg)
+            layer = BasicLayer(**_layer_cfg) # 论文中的Video-Swin Transformer Block（可能包含不同的depth）
             self.layers.append(layer)
 
             dpr = dpr[depth:]
@@ -887,6 +892,7 @@ class SwinTransformer3D(BaseModule):
             self.add_module(f'norm{i}', norm_layer)
 
         self._freeze_stages()
+        self.debug = True
 
     def _freeze_stages(self) -> None:
         """Prevent all the parameters from being optimized before
@@ -991,6 +997,10 @@ class SwinTransformer3D(BaseModule):
     def forward(self, x: torch.Tensor) -> \
             Union[Tuple[torch.Tensor], torch.Tensor]:
         """Forward function for Swin3d Transformer."""
+        # x.shape B C(3) T H W 
+        # out.shape B C(3*32*32*2) T
+        if self.debug:
+            print(f"in SwinTransformer3D.forward, x.shape={x.shape}")
         x = self.patch_embed(x)
 
         x = self.pos_drop(x)
@@ -1012,8 +1022,13 @@ class SwinTransformer3D(BaseModule):
                 x = rearrange(x, 'b d h w c -> b c d h w')
 
         if len(outs) == 1:
+            if self.debug:
+                print(f"out.shape={outs[0].shape}")
+                self.debug = False 
             return outs[0]
-
+        if self.debug:
+            print(f"tuple outs len={len(outs)}")
+            self.debug = False
         return tuple(outs)
 
     def train(self, mode: bool = True) -> None:

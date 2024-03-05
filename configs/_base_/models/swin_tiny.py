@@ -26,3 +26,4 @@ model = dict(
         spatial_type='avg',
         dropout_ratio=0.5,
         average_clips='prob'))
+ 

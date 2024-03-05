@@ -3,8 +3,11 @@ import argparse
 import os
 import os.path as osp
 
+import torch
 from mmengine.config import Config, DictAction
 from mmengine.runner import Runner
+from matplotlib import pyplot as plt
+from matplotlib import animation
 
 from mmaction.registry import RUNNERS
 
@@ -59,6 +62,7 @@ def parse_args():
         default='none',
         help='job launcher')
     parser.add_argument('--local_rank', '--local-rank', type=int, default=0)
+    parser.add_argument('--test-vae', action='store_true', help='test vae added by ant', default=False)
     args = parser.parse_args()
     if 'LOCAL_RANK' not in os.environ:
         os.environ['LOCAL_RANK'] = str(args.local_rank)
@@ -125,7 +129,8 @@ def main():
 
     # merge cli arguments to config
     cfg = merge_args(cfg, args)
-
+    print(f"cfg={cfg}")
+    # assert(0)
     # build the runner from config
     if 'runner_type' not in cfg:
         # build the default runner
@@ -134,9 +139,42 @@ def main():
         # build customized runner from the registry
         # if 'runner_type' is set in the cfg
         runner = RUNNERS.build(cfg)
-
+    # assert(0)
     # start training
     runner.train()
+    
+    if args.test_vae:
+        train_dataloader = runner.train_dataloader
+        i = 0
+        for batch in train_dataloader:
+            video = batch['inputs'][0] 
+            video = (video.cuda() - runner.model.data_preprocessor.mean.cuda()) / runner.model.data_preprocessor.std.cuda()
+
+            
+            with torch.no_grad():
+                video_recon = runner.model.loss(video)[1]
+
+            video = ((video * runner.model.data_preprocessor.std.cuda()) + runner.model.data_preprocessor.mean.cuda())
+            video_recon = ((video_recon * runner.model.data_preprocessor.std.cuda()) + runner.model.data_preprocessor.mean.cuda())
+            videos = torch.cat((video, video_recon), dim=-1)
+        
+            videos = videos[0].permute(1, 2, 3, 0).detach().cpu().numpy().astype('uint8') 
+            fig = plt.figure()
+            plt.axis('off')
+            im = plt.imshow(videos[0, :,:,:])
+            plt.close()
+            
+            def init():
+                im.set_data(videos[0, :, :, :])
+
+            def animate(i):
+                im.set_data(videos[i, :, :, :])
+                return im
+            anim = animation.FuncAnimation(fig, animate, init_func=init, frames=videos.shape[0], interval=200) # 200ms = 5 fps
+            anim.save(f'before_train_animation{i}.mp4', writer='ffmpeg', fps=5)
+            i += 1
+            if i == 10:
+                break 
 
 
 if __name__ == '__main__':
