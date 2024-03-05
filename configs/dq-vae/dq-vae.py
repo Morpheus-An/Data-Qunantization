@@ -121,7 +121,7 @@ param_scheduler = [
         end=2.5,
         convert_to_iter_based=True),
     dict(
-        type='CosineAnnealingLR',
+        type='CosineAnnealingLpdR',
         T_max=30,
         eta_min=0,
         by_epoch=True,
