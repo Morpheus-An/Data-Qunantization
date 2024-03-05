@@ -121,7 +121,7 @@ param_scheduler = [
         end=2.5,
         convert_to_iter_based=True),
     dict(
-        type='CosineAnnealingLpdR',
+        type='CosineAnnealingLR',
         T_max=30,
         eta_min=0,
         by_epoch=True,
@@ -139,5 +139,5 @@ default_hooks = dict(
 #   - `base_batch_size` = (8 GPUs) x (8 samples per GPU).
 auto_scale_lr = dict(enable=False, base_batch_size=64)
 # load_from = '/home/wangkai/big_space/ant/mmaction2-main/work_dirs/video-swin/best_acc_top1_epoch_44.pth'
-# load_from = '/home/wangkai/big_space/ant/mmaction2-main/work_dirs/dq-vae/epoch_21.pth'
+load_from = '/home/wangkai/big_space/ant/mmaction2-main/work_dirs/dq-vae/epoch_30.pth'
 # resume = True
